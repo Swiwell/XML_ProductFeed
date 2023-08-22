@@ -6,10 +6,15 @@ db_connection = sqlite3.connect('data.sqlite')
 cursor = db_connection.cursor()
 
 query = """
-SELECT p.product_id, pd.name AS title, pd.description, 'https://butopea.com/p/' + m.manufacturer_id AS link,
-       pi.image AS image_link, GROUP_CONCAT(pi.image) AS additional_image_link,
+SELECT p.product_id, 
+       pd.name AS title, 
+       pd.description, 
+       'https://butopea.com/p/' + m.manufacturer_id AS link,
+       pi.image AS image_link, 
+       GROUP_CONCAT(pi.image) AS additional_image_link,
        CASE WHEN p.quantity > 0 THEN 'in_stock' ELSE 'out_of_stock' END AS availability,
-       p.price, m.name AS brand
+       p.price, 
+       m.name AS brand
 FROM product p
 JOIN product_description pd ON p.product_id = pd.product_id
 LEFT JOIN product_image pi ON p.product_id = pi.product_id
@@ -24,10 +29,8 @@ root = ET.Element("rss")
 root.set("version", "2.0")
 root.set("xmlns:g", "http://base.google.com/ns/1.0")
 
-# Create the channel element
 channel = ET.SubElement(root, "channel")
 
-# Loop through the retrieved data and create XML elements for each product
 for row in data:
     item = ET.SubElement(channel, "item")
 
@@ -46,11 +49,9 @@ for row in data:
     ET.SubElement(item, "brand").text = row[8]
     ET.SubElement(item, "condition").text = "new"
 
-# Create a nicely formatted XML string
 xml_string = ET.tostring(root, encoding="unicode")
 xml_pretty_string = minidom.parseString(xml_string).toprettyxml(indent="  ")
 
-# Save the XML data to a file
 with open('feed.xml', 'w',  encoding='utf-8') as xml_file:
     xml_file.write(xml_pretty_string)
 
